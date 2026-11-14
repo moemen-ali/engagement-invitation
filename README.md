@@ -60,6 +60,8 @@ These must be done before the link is sent to guests:
       change `CONFIG.name2Ar`.
 - [ ] **End time.** 7:00 PM was assumed (no end time was given). Change `CONFIG.end` if needed.
 - [ ] Add the live URL at the top of this file.
+- [ ] **Couple drawing from the invitation card** (bride and groom seen from behind): planned for the Countdown
+      section; waiting for the image file to be added to the repo (ideally high-resolution / transparent background).
 
 ## Quick start
 
@@ -177,7 +179,8 @@ const CONFIG = {
 
 In order:
 
-1. **Hero** — lavender sky gradient, soft sun glow (top right), festoon string lights with glowing bulbs; eyebrow
+1. **Hero** — lavender sky gradient, soft sun glow (top right), festoon string lights with glowing bulbs; a pair of
+   **interlocked gold and silver rings** (flat-profile bands, SVG); eyebrow
    "Together with their families"; names in Great Vibes script with a Cormorant `&`; Arabic names (Amiri); Arabic invite
    line «بكل الحب ندعوكم لمشاركتنا فرحة خطوبتنا»; "Invite you to a seaside engagement celebration"; date line;
    **Kindly RSVP** button (jumps to `#rsvp`); then the **SVG stage scene** (see [Hero stage art](#hero-stage-art-svg-generator)).
@@ -242,30 +245,54 @@ No emoji as icons.
 
 **Motion:** gentle only — scroll reveal (0.7s), sea swell drift (10s), bulb glow (3.2s). All off under reduced motion.
 
+**Ring metals:** the rings are the one place gold and silver appear (gold `#b8892f`–`#fbe7ae`,
+silver `#636a79`–`#f8f9fb`). Don't spread gold into the UI — `--glow` stays limited to the sun and bulbs.
+
 **Don't:** dark/night themes, sunset orange as a main colour, pink or red accents (keep roses on the blue side of lavender).
 
 ## Hero stage art (SVG generator)
+
+All inline SVG art in the hero comes from [`tools/stage-art.py`](tools/stage-art.py): the **stage scene**, the
+**arch line drawing** and the **rings**.
+
+### Stage scene
 
 The hero's stage scene is inline SVG modelled on the real venue stage: a **wavy central arch** with a raised relief line,
 two plain **side arches**, ~100 **roses/blooms** with sage leaves cascading down the arches (lavender `#b7a6ee`, violet
 `#8a70dc`, periwinkle `#9aaaf2`, blue `#6f8fe0`, pale lilac, white), a blue **sea band** with drifting white swell lines
 that fades into the page, and a white **stage platform** with steps.
 
-It is produced by [`tools/stage-art.py`](tools/stage-art.py) (seeded random, so the output is stable):
+It is produced by the script (seeded random, so the output is stable):
 
 ```bash
-python tools/stage-art.py out/          # writes out/scene.svg, out/archline.svg, out/preview.html
+python tools/stage-art.py out/          # writes out/scene.svg, out/archline.svg, out/rings.svg, out/preview.html
 ```
 
 Then replace in `index.html`:
 - the `<svg class="scene" …>…</svg>` block with `scene.svg`;
 - the `<symbol id="archLine" …>…</symbol>` (inside the hidden sprite at the top of `<body>`) with `archline.svg`
-  — this is the faint arch line drawing used behind the RSVP form and footer.
+  — this is the faint arch line drawing used behind the RSVP form and footer;
+- the `<svg class="rings" …>…</svg>` block (top of the hero `.intro`) with `rings.svg`.
 
 `preview.html` lets you look at the art on its own first. Layout rules:
 - Phones (≤ 640px): the scene sits in a square box with `preserveAspectRatio="xMidYMax slice"`, so it crops to the central arch.
 - Wider screens: height `min(56svh, 620px)` at the full 1000×700 ratio, showing all three arches.
 - The SVG has `overflow="visible"` so the sea band runs the full viewport width (the hero clips it).
+
+### Rings
+
+Two interlocked **flat-profile bands** (flat top rim, straight vertical sides — not domed), modelled on a plain
+gold wedding band: **gold** on the left, **silver** on the right, seen from slightly above with a soft shadow.
+Each band is built from an elliptical top rim, a front face with a vertical metallic gradient (highlights plus a
+dark streak) and an inner back wall, with a see-through opening.
+
+The interlock is geometrically correct: the script intersects the two rings' circles in top view to find the front
+and back crossing points, and swaps which band is in front exactly there (gold passes behind the silver front face
+and in front of its back wall; the silver's left side shows inside the gold ring). Change size/spacing via
+`RR`, `RY`, `BAND`, `WALL` and the centres `GC`/`SC`; colours via `METALS`.
+
+In the page the SVG is `.rings` (`width: clamp(118px, 30vw, 160px)`), `role="img"` with
+`aria-label="Gold and silver engagement rings"`.
 
 ## Images
 
@@ -371,12 +398,16 @@ Why things are the way they are. Add new decisions at the bottom.
 | 2026-11-14 | Emoji in dress-code tips replaced with **SVG icons** | Consistency and accessibility (ui-ux-pro-max checklist). |
 | 2026-11-14 | Skill's pink palette and "testimonials" page pattern **rejected** | Pink is off-brand; testimonials make no sense for an invitation. |
 | 2026-11-14 | Decorative "rounded line bundles" background in every section **tried and reverted** | The couple didn't like the look. Don't reintroduce without showing a mock-up first. |
+| 2026-11-14 | **Interlocked gold + silver flat-profile rings** at the top of the hero | Couple's request, modelled on a plain flat gold band (not rounded). |
+| 2026-11-14 | A separate printed invitation card is used **only as an art source** — its details (4 PM, "The Open Air Hall", Gleem, "Alaa & Mo'men" order) are **not** used | Couple's instruction: keep the site's details (3 PM, The Blue View, "Mo'men & Alaa"). |
 
 ## Changelog
 
 Newest first. Every change to the site adds an entry here.
 
 ### 2026-11-14
+- **Rings:** added interlocked gold and silver flat-profile rings (SVG) above "Together with their families" in the
+  hero; generated by `tools/stage-art.py` (`rings.svg`) with geometrically computed crossings.
 - **Repo set up for collaboration:** added this README (full context), `.gitignore`, `tools/check.py`, and a rule in
   `CLAUDE.md` to keep this README updated with every change.
 - **Reverted** the section-corner line-art background and the line halo behind the hero stage.

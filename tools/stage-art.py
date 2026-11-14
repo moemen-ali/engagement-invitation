@@ -1,4 +1,5 @@
-"""Generates the hero stage SVG (central wavy arch + side arches + roses) for index.html."""
+"""Generates the inline SVG art for index.html: the hero stage scene (central wavy arch + side arches + roses)
+-> scene.svg, the arch line drawing -> archline.svg, and the interlocked gold/silver rings -> rings.svg."""
 import random, sys
 
 random.seed(21)
@@ -111,7 +112,71 @@ svg = f'''<svg class="scene" overflow="visible" viewBox="0 0 1000 700" preserveA
 
 line = f'<symbol id="archLine" viewBox="250 60 500 560"><path d="{frame}" fill="none" stroke="currentColor" stroke-width="2"/><path d="{relief}" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>'
 
+# Hero rings: interlocked gold + silver flat-profile bands (flat top rim, straight sides), seen from slightly above.
+RR, RY, BAND, WALL = 60, 18, 22, 6             # outer radius, ellipse squash (ry), band height, rim thickness
+RI, RYI = RR - WALL, RY * (RR - WALL) / RR      # inner ellipse
+METALS = {
+    "gold": dict(face=["#b8892f", "#f6dc95", "#d9ac4f", "#8a6420", "#e9c46d", "#fbe7ae", "#b8892f"],
+                 rim=["#f9e8b4", "#e2bd6a"], inner=["#9a7124", "#f1d38a", "#a9802c"]),
+    "silver": dict(face=["#8f95a3", "#eef0f5", "#c3c7d1", "#636a79", "#d7dae2", "#f8f9fb", "#8f95a3"],
+                   rim=["#fbfbfd", "#cfd3dc"], inner=["#7d8391", "#e7e9ef", "#858b98"]),
+}
+
+
+def stops(cols): return "".join(f'<stop offset="{i / (len(cols) - 1):.2f}" stop-color="{c}"/>' for i, c in enumerate(cols))
+
+
+def ring_parts(m, cx, cy):
+    """back = inner wall (with see-through hole) + back half of rim; front = front face + front half of rim"""
+    face = (f"M{cx - RR} {cy}A{RR} {RY} 0 0 0 {cx + RR} {cy}V{cy + BAND}A{RR} {RY} 0 0 1 {cx - RR} {cy + BAND}Z")
+    rim_back = (f"M{cx - RR} {cy}A{RR} {RY} 0 0 1 {cx + RR} {cy}H{cx + RI}A{RI} {RYI:g} 0 0 0 {cx - RI} {cy}Z")
+    rim_front = (f"M{cx - RR} {cy}A{RR} {RY} 0 0 0 {cx + RR} {cy}H{cx + RI}A{RI} {RYI:g} 0 0 1 {cx - RI} {cy}Z")
+    back = (f'<clipPath id="{m}Open"><ellipse cx="{cx}" cy="{cy}" rx="{RI}" ry="{RYI:g}"/></clipPath>'
+            f'<mask id="{m}Hole" maskUnits="userSpaceOnUse" x="0" y="0" width="220" height="110"><rect width="220" height="110" fill="#fff"/>'
+            f'<ellipse cx="{cx}" cy="{cy + BAND}" rx="{RI}" ry="{RYI:g}" clip-path="url(#{m}Open)"/></mask>'
+            f'<ellipse cx="{cx}" cy="{cy}" rx="{RI}" ry="{RYI:g}" fill="url(#{m}In)" mask="url(#{m}Hole)"/>'
+            f'<path d="{rim_back}" fill="url(#{m}Rim)"/>')
+    front = f'<path d="{face}" fill="url(#{m}Face)"/><path d="{rim_front}" fill="url(#{m}Rim)"/>'
+    return back, front, face
+
+
+GC, SC = (72, 38), (140, 46)
+g_back, g_front, _ = ring_parts("gold", *GC)
+s_back, s_front, s_face = ring_parts("silver", *SC)
+
+
+def crossings():
+    """x of the front and back points where the two bands cross (circle intersection in top view, y = depth * RY/RR)"""
+    k = RY / RR
+    (x1, z1), (x2, z2) = (GC[0], GC[1] / k), (SC[0], SC[1] / k)
+    dx, dz = x2 - x1, z2 - z1
+    d = (dx * dx + dz * dz) ** .5
+    h = (RR * RR - (d / 2) ** 2) ** .5
+    mx, mz, px, pz = (x1 + x2) / 2, (z1 + z2) / 2, -dz / d, dx / d
+    a, b = (mx + px * h, mz + pz * h), (mx - px * h, mz - pz * h)
+    front, back = (a, b) if a[1] > b[1] else (b, a)
+    return front[0], back[0]
+
+
+X_FRONT, X_BACK = crossings()
+defs = "".join(
+    f'<linearGradient id="{m}Face" x1="0" x2="1">{stops(c["face"])}</linearGradient>'
+    f'<linearGradient id="{m}Rim" x1="0" y1="0" x2="0" y2="1">{stops(c["rim"])}</linearGradient>'
+    f'<linearGradient id="{m}In" x1="0" x2="1">{stops(c["inner"])}</linearGradient>' for m, c in METALS.items())
+# where the gold band passes through the silver ring, the silver front face covers it (right-hand crossing only)
+defs += (f'<clipPath id="rightHalf"><rect x="{X_FRONT:.1f}" y="0" width="160" height="110"/></clipPath>'
+         f'<clipPath id="pastBack"><rect x="{X_BACK:.1f}" y="0" width="160" height="110"/></clipPath>'
+         '<mask id="goldBehind" maskUnits="userSpaceOnUse" x="0" y="0" width="220" height="110"><rect width="220" height="110" fill="#fff"/>'
+         f'<path d="{s_face}" clip-path="url(#rightHalf)"/></mask>'
+         '<filter id="ringShadow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>')
+rings = (f'<svg class="rings" viewBox="0 12 212 94" role="img" aria-label="Gold and silver engagement rings">'
+         f'<defs>{defs}</defs>'
+         f'<ellipse cx="106" cy="92" rx="88" ry="8" fill="#2e2766" opacity=".14" filter="url(#ringShadow)"/>'
+         f'{g_back}{s_back}<g clip-path="url(#pastBack)">{g_back.split("</mask>", 1)[1]}</g>'
+         f'{s_front}<g mask="url(#goldBehind)">{g_front}</g></svg>')
+
 open(sys.argv[1] + "/scene.svg", "w", encoding="utf-8").write(svg)
+open(sys.argv[1] + "/rings.svg", "w", encoding="utf-8").write(rings)
 open(sys.argv[1] + "/archline.svg", "w", encoding="utf-8").write(line)
 open(sys.argv[1] + "/preview.html", "w", encoding="utf-8").write(
     '<body style="margin:0;background:linear-gradient(#ece8fc,#d9e2fa)"><div style="width:100%;aspect-ratio:1000/700">'

@@ -1,0 +1,119 @@
+"""Generates the hero stage SVG (central wavy arch + side arches + roses) for index.html."""
+import random, sys
+
+random.seed(21)
+DX = 190  # shift central arch into the 1000-wide scene
+
+OUT = [(100, 610), [(112, 540), (70, 470), (92, 400)], [(112, 330), (72, 250), (86, 175)],
+       [(92, 112), (130, 84), (180, 86)], [(240, 88), (270, 122), (320, 114)],
+       [(370, 106), (410, 70), (460, 74)], [(510, 78), (532, 112), (528, 165)],
+       [(522, 245), (550, 315), (532, 395)], [(514, 470), (550, 540), (534, 610)]]
+INN = [(186, 610), [(198, 540), (158, 470), (178, 400)], [(196, 335), (160, 262), (172, 214)],
+       [(178, 184), (198, 170), (226, 170)], [(268, 172), (296, 194), (330, 188)],
+       [(366, 180), (398, 158), (428, 160)], [(452, 162), (450, 192), (447, 222)],
+       [(442, 290), (464, 330), (448, 398)], [(432, 470), (464, 540), (448, 610)]]
+
+
+def p(pt): return f"{pt[0] + DX:g} {pt[1]:g}"
+
+
+def path(pts, close=""):
+    d = f"M{p(pts[0])}" + "".join(f"C{p(a)} {p(b)} {p(c)}" for a, b, c in pts[1:])
+    return d + close
+
+
+def mid(a, b): return ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+
+
+MID = [mid(OUT[0], INN[0])] + [[mid(x, y) for x, y in zip(s, t)] for s, t in zip(OUT[1:], INN[1:])]
+frame = path(OUT) + f"L{p(OUT[0])}Z" + path(INN) + f"L{p(INN[0])}Z"
+relief = path(MID)
+
+ROSE = ["#b7a6ee", "#8a70dc", "#9aaaf2", "#ffffff", "#6f8fe0", "#d6cdf7", "#ffffff"]
+
+
+def bez(s, seg, t):
+    a = s[seg - 1] if seg - 1 == 0 else s[seg - 1][2]
+    b, c, d = s[seg]
+    u = 1 - t
+    return tuple(u**3 * a[i] + 3 * u * u * t * b[i] + 3 * u * t * t * c[i] + t**3 * d[i] for i in (0, 1))
+
+
+def along(segs, n):
+    """points on the arch band midline over the given segment numbers"""
+    pts = []
+    for seg in segs:
+        for k in range(n):
+            x, y = bez(MID, seg, (k + .5) / n)
+            pts.append((x + DX, y))
+    return pts
+
+
+flowers, leaves = [], []
+
+
+def cluster(pts, spread, big):
+    for (x, y) in pts:
+        for _ in range(2):
+            lx, ly = x + random.uniform(-spread, spread) * 1.3, y + random.uniform(-spread, spread) * 1.3
+            leaves.append(f'<use href="#leaf" transform="translate({lx:.0f} {ly:.0f}) rotate({random.randint(0, 359)}) scale({random.uniform(.9, 1.4):.2f})"/>')
+        for _ in range(3):
+            fx, fy = x + random.uniform(-spread, spread), y + random.uniform(-spread, spread)
+            s = random.uniform(*big)
+            kind = "rose" if random.random() < .8 else "bloom"
+            col = random.choice(ROSE)
+            flowers.append(f'<use href="#{kind}" style="color:{col}" transform="translate({fx:.0f} {fy:.0f}) rotate({random.randint(0, 359)}) scale({s:.2f})"/>')
+
+
+# central arch: top-left corner cascading down the left leg, top-right corner down the right leg
+cluster(along([2], 5)[1:] + along([3], 4) + along([4], 3)[:1], 20, (1.15, 1.75))
+cluster(along([1], 4)[1:3], 16, (.9, 1.3))
+cluster(along([5], 3)[1:] + along([6], 4) + along([7], 5), 20, (1.15, 1.75))
+cluster(along([8], 3)[:1], 16, (.9, 1.25))
+# side arches: outer flanks
+cluster([(70, 262), (52, 310), (44, 360), (46, 410), (56, 460)], 15, (.85, 1.2))
+cluster([(930, 262), (948, 310), (956, 360), (954, 410), (944, 460)], 15, (.85, 1.2))
+
+side = ("M40 610V320C40 180 230 180 230 320V610H185V325C185 240 85 240 85 325V610Z"
+        "M770 610V320C770 180 960 180 960 320V610H915V325C915 240 815 240 815 325V610Z")
+
+svg = f'''<svg class="scene" overflow="visible" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7f9ce8"/><stop offset=".72" stop-color="#3a64c8"/><stop offset="1" stop-color="#f8f7fe"/></linearGradient>
+    <linearGradient id="archG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9e5fb"/></linearGradient>
+    <radialGradient id="roseShade"><stop offset=".15" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#1e1650" stop-opacity=".22"/></radialGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#2e2766" flood-opacity=".18"/></filter>
+    <g id="rose"><g fill="currentColor"><circle cx="0" cy="-8" r="6.5"/><circle cx="7.6" cy="-2.5" r="6.5"/><circle cx="4.7" cy="6.5" r="6.5"/><circle cx="-4.7" cy="6.5" r="6.5"/><circle cx="-7.6" cy="-2.5" r="6.5"/></g><circle r="11" fill="currentColor"/><circle r="11" fill="url(#roseShade)"/>
+      <g fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.2" stroke-linecap="round">
+        <path d="M-2 -1C-2 -4 3 -4 3 -1C3 2-1 3-2 1"/><path d="M-6 0C-6-6 1-8 5-5"/><path d="M6-2C8 3 3 8-2 7"/><path d="M-8 3C-6 8 0 9 3 8"/></g></g>
+    <g id="bloom" fill="currentColor"><circle cx="0" cy="-5" r="4.2"/><circle cx="5" cy="-1" r="4.2"/><circle cx="3" cy="5" r="4.2"/><circle cx="-3" cy="5" r="4.2"/><circle cx="-5" cy="-1" r="4.2"/><circle r="2.2" fill="#fff" opacity=".8"/></g>
+    <g id="leaf"><path d="M-11 0C-5-6 5-6 11 0C5 6-5 6-11 0Z" fill="#8fae9f"/><path d="M-10 0H9" stroke="#6f9282" stroke-width=".7"/></g>
+  </defs>
+  <rect x="-3000" y="430" width="7000" height="200" fill="url(#seaG)"/>
+  <g class="swell" fill="none" stroke="#fff" stroke-linecap="round" stroke-opacity=".55" stroke-width="2">
+    <path d="M-3150 470c60-10 120 10 180 0s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0"/>
+    <path d="M-3120 520c60-10 120 10 180 0s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0" stroke-opacity=".4"/>
+    <path d="M-3170 570c60-10 120 10 180 0s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0  120 10 180 0 s120-10 180 0" stroke-opacity=".3"/>
+  </g>
+  <g filter="url(#soft)">
+    <path d="{side}" fill="url(#archG)" fill-rule="evenodd" stroke="#cfc6f3" stroke-width="1.5" opacity=".92"/>
+    <path d="{frame}" fill="url(#archG)" fill-rule="evenodd" stroke="#cfc6f3" stroke-width="1.5"/>
+  </g>
+  <path d="{relief}" fill="none" stroke="#d9d2f7" stroke-width="2"/>
+  <g>{''.join(leaves)}</g>
+  <g>{''.join(flowers)}</g>
+  <g fill="#fff" stroke="#d9d2f7" stroke-width="1.5">
+    <rect x="20" y="608" width="960" height="44" rx="3"/>
+    <rect x="330" y="640" width="340" height="34" rx="3"/>
+    <rect x="380" y="668" width="240" height="32" rx="3"/>
+  </g>
+</svg>'''
+
+line = f'<symbol id="archLine" viewBox="250 60 500 560"><path d="{frame}" fill="none" stroke="currentColor" stroke-width="2"/><path d="{relief}" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>'
+
+open(sys.argv[1] + "/scene.svg", "w", encoding="utf-8").write(svg)
+open(sys.argv[1] + "/archline.svg", "w", encoding="utf-8").write(line)
+open(sys.argv[1] + "/preview.html", "w", encoding="utf-8").write(
+    '<body style="margin:0;background:linear-gradient(#ece8fc,#d9e2fa)"><div style="width:100%;aspect-ratio:1000/700">'
+    + svg.replace('class="scene"', 'style="width:100%;height:100%"') + '</div></body>')
+print(len(svg), "bytes;", len(flowers), "flowers")

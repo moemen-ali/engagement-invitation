@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Claude Code personal settings (shared rules live in CLAUDE.md and .claude/skills)
+.claude/settings.local.json
+
+# Scratch output from tools/stage-art.py
+out/

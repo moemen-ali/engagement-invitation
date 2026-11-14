@@ -1,7 +1,7 @@
 # Mo'men & Alaa — Engagement Invitation Website
 
 A single-page invitation website for an open-air engagement party by the sea.
-The party is at 3 PM on Saturday 21 November 2026, Cairo time (UTC+02:00),
+The party is at 4 PM on Saturday 21 November 2026, Cairo time (UTC+02:00),
 at **The Blue View, Engineers Club, Alexandria** ([Maps](https://maps.app.goo.gl/B5Ygc689t4PCkwjm6)).
 
 ## Keep README.md up to date (required)
@@ -26,13 +26,15 @@ Don't say a change is done until README.md reflects it.
 ├── .gitignore
 ├── index.html     ← the whole site: markup, CSS and JS in one file
 ├── stage.jpg      ← illustrated venue stage art, optimized (portrait, 900×1200, ~180 KB)
-├── og-image.jpg   ← landscape crop of the stage art for link previews (1200×630)
-├── couple.webp    ← bride & groom line drawing (Countdown section), made by tools/couple-art.py
-├── invitation.jfif ← printed invitation card: art source for couple.webp only. Not used by the page
+├── og-card.jpg    ← link preview (designed card), made by tools/og-card.py — re-run it after changing CONFIG
+├── couple.webp    ← bride & groom illustration (Countdown section), cut out by tools/couple-art.py
+├── invitation-2.png ← generated couple illustration (source of couple.webp; prompt in README). Not used by the page
+├── invitation.jfif ← printed invitation card: reference image only. Not used by the page
 ├── stage.png      ← original source art (1086×1448, 2.6 MB). Not used by the page; don't ship it
 ├── tools/stage-art.py          ← generates the hero's inline SVG stage art (see "Hero art" below). Not shipped
 ├── tools/check.py              ← automated browser checks (Playwright). Not shipped
-├── tools/couple-art.py         ← extracts couple.webp from the card (Pillow + NumPy). Not shipped
+├── tools/og-card.py            ← renders og-card.jpg from CONFIG + page art (Playwright). Not shipped
+├── tools/couple-art.py         ← cuts couple.webp out of invitation-2.png (Pillow + NumPy). Not shipped
 └── .claude/skills/ui-ux-pro-max ← design-intelligence skill (MIT, nextlevelbuilder/ui-ux-pro-max-skill). Not shipped
 ```
 
@@ -57,10 +59,10 @@ Never hard-code these values in the markup.
 ## Sections (in order)
 
 1. **Hero**: lavender sky gradient, soft sun glow (top right), festoon string lights, interlocked gold + silver flat-profile rings (SVG), names in script with the Arabic names below, Arabic invite line, date, a "Kindly RSVP" button, then the SVG stage scene (wavy central arch + two side arches with cascading roses, in front of a blue sea with drifting swell lines).
-2. **Countdown**: the couple drawing (`couple.webp`) in a lavender arch panel, then days, hours, minutes and seconds to `CONFIG.start`.
-   The dress is **white**; the groom's suit stays **outline only** until its colour is confirmed (then add a fill in `tools/couple-art.py`).
-3. **Stage ("Under the Arches")**: `stage.jpg` in an arch-shaped frame. The frame's aspect ratio matches the image (900/1200), so update it if the image changes.
-4. **Details**: three arch-topped cards with SVG icons (When / Time / Where), a Maps link and an "Add to calendar" button (Google Calendar link).
+2. **Countdown**: the couple illustration (`couple.webp`) on a lavender venue-arch panel, then venue-arch tiles with days, hours, minutes and seconds to `CONFIG.start`.
+   The dress is **white**; the groom's suit is **dark charcoal grey** (both confirmed).
+3. **Stage ("Under the Arches")**: `stage.jpg` in a venue-arch frame. The frame's aspect ratio matches the image (900/1200), so update it if the image changes.
+4. **Details**: three venue-arch cards with SVG icons (When / Time / Where), a Maps link and an "Add to calendar" button (Google Calendar link).
 5. **Dress code ("Coastal Chic")**: labelled palette swatches and tip pills with SVG icons.
 6. **RSVP**: a form that opens WhatsApp with a prefilled message, with an inline error if the name is empty. There is no backend. A faint line drawing of the central arch sits behind it.
 7. **Footer**: names (script + Arabic), the Arabic line "في انتظاركم", the date, and the faint arch line drawing.
@@ -91,13 +93,17 @@ The stage photo keeps its natural colours; everything around it uses the tokens 
 - **Headings:** Cormorant Garamond (400, italic for accents).
 - **Body and labels:** Jost 300 at 1rem. Labels are 500 weight, uppercase, wide letter-spacing, never smaller than .75rem.
 - **Arabic:** Amiri, with `direction: rtl` (`.ar` class).
-- **Shapes:** arches (rounded tops: countdown tiles, cards, swatches, photo frame) and soft waves. Reuse these motifs rather than adding new ones.
+- **Shapes:** the photo frame, couple panel, countdown tiles and detail cards use the **venue-arch frame** (the stage's
+  central-arch silhouette: `.frame` + `.frame-line` + `.frame-shape.venue`, `--venue-arch` mask, `#venueArch` symbol,
+  `--frame-gap` for the outline offset — see README "Venue-arch frame"). Any new framed image, panel or card must use it,
+  not a generic rounded shape. Simple rounded-top arches only for the small swatches and favicon; soft waves in the hero.
+  Reuse these motifs rather than adding new ones.
 - **Icons:** inline stroke SVGs (`.icon`, 24px grid, 1.6 stroke), `aria-hidden="true"`. No emoji as icons.
 - **Touch:** buttons, inputs and links are at least 44px tall. Form fields use 1rem text so iOS doesn't zoom.
 - **Motion:** gentle only. This means scroll reveal (`.reveal` → `.in`, only when JS runs), drifting sea swell and glowing bulbs.
   All of it is switched off under `prefers-reduced-motion`. Do the same for any animation you add.
 - A printed invitation card exists, but it's **only an art source**: never take event details from it
-  (its time, venue and name order differ on purpose). `CONFIG` is the source of truth.
+  (its venue wording and name order differ on purpose). `CONFIG` is the source of truth.
 - Don't use dark or night themes, sunset oranges as a main color, or pink and red accents
   (keep roses on the blue side of lavender).
 
@@ -153,14 +159,17 @@ Before saying a change is done, check all of the following:
 
 Static hosting works. The simplest options are:
 - **Netlify Drop:** drag the folder onto app.netlify.com/drop.
-- **GitHub Pages:** Settings → Pages → deploy from `main` / root. Pages serves every file in the repo
+- **GitHub Pages (chosen, https://moemen-ali.github.io/engagement-invitation/):** Settings → Pages → deploy from `main` / root. Pages serves every file in the repo
   (including `stage.png`, `tools/`, `.claude/`); that's harmless, but never commit secrets.
 
 Before sharing the link:
 - Set `CONFIG.whatsapp` to the real number.
-- Change `og:image` to an absolute URL (e.g. `https://<site>/og-image.jpg`). WhatsApp ignores relative image URLs.
-- The favicon is an inline SVG data URI (a small lilac arch with two roses) in `<head>`.
-- For Netlify Drop, upload only `index.html`, `stage.jpg`, `og-image.jpg` and `couple.webp`.
+- `og:url` and `og:image` are absolute URLs on `https://moemen-ali.github.io/engagement-invitation/` (WhatsApp ignores relative image URLs).
+  If the site moves, change both. After changing names, date/time, venue, rings or the stage photo, re-run
+  `python tools/og-card.py og-card.jpg` and keep the `<head>` description/og text in sync.
+- The favicon is an inline SVG data URI in `<head>`: the venue's central arch with roses, generated by `tools/stage-art.py`
+  (`favicon-uri.txt`). Encode `#` as `%23` in data URIs.
+- For Netlify Drop, upload only `index.html`, `stage.jpg`, `couple.webp` and the link-preview image in use.
 
 ## Git
 

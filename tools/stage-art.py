@@ -1,5 +1,7 @@
 """Generates the inline SVG art for index.html: the hero stage scene (central wavy arch + side arches + roses)
--> scene.svg, the arch line drawing -> archline.svg, and the interlocked gold/silver rings -> rings.svg."""
+-> scene.svg, the arch line drawing -> archline.svg, the interlocked gold/silver rings -> rings.svg, and the
+venue-arch frame shape (central arch silhouette) -> frame-symbol.svg + frame-mask.css.txt, and the favicon
+(central arch + roses) -> favicon.svg + favicon-uri.txt."""
 import random, sys
 
 random.seed(21)
@@ -175,7 +177,43 @@ rings = (f'<svg class="rings" viewBox="0 12 212 94" role="img" aria-label="Gold 
          f'{g_back}{s_back}<g clip-path="url(#pastBack)">{g_back.split("</mask>", 1)[1]}</g>'
          f'{s_front}<g mask="url(#goldBehind)">{g_front}</g></svg>')
 
+# Venue-arch frame: the central arch's outer silhouette (wavy top dipping in the middle, wavy sides, flat base),
+# used to frame images/panels in the page. Coordinates are normalised to a 0-100 box so it can stretch to any size.
+def silhouette_pts(n=24):
+    pts = []
+    for seg in range(1, len(OUT)):
+        for k in range(n):
+            pts.append(bez(OUT, seg, k / n))
+    return pts + [OUT[-1][2]]
+
+
+_sp = silhouette_pts()
+_x0, _x1 = min(x for x, _ in _sp), max(x for x, _ in _sp)
+_y0, _y1 = min(y for _, y in _sp), max(y for _, y in _sp)
+
+
+def norm(pt): return f"{(pt[0] - _x0) / (_x1 - _x0) * 100:.2f} {(pt[1] - _y0) / (_y1 - _y0) * 100:.2f}"
+
+
+frame_d = f"M{norm(OUT[0])}" + "".join(f"C{norm(a)} {norm(b)} {norm(c)}" for a, b, c in OUT[1:]) + "Z"
+frame_symbol = (f'<symbol id="venueArch" viewBox="0 0 100 100" preserveAspectRatio="none">'
+                f'<path d="{frame_d}" vector-effect="non-scaling-stroke"/></symbol>')
+frame_mask = ("url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' "
+              f"preserveAspectRatio='none'%3E%3Cpath d='{frame_d}'/%3E%3C/svg%3E\")")
+
+# Favicon: the central arch (with its opening) in lilac + violet outline, with roses on the corners like the stage
+fav_svg = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='225 40 550 590'>"
+           f"<path d='{frame}' fill='#d9d2f7' fill-rule='evenodd' stroke='#6a4cc4' stroke-width='28' stroke-linejoin='round'/>"
+           "<circle cx='300' cy='150' r='54' fill='#8a70dc'/><circle cx='372' cy='98' r='44' fill='#9aaaf2'/>"
+           "<circle cx='690' cy='140' r='48' fill='#b7a6ee'/><circle cx='298' cy='250' r='34' fill='#6f8fe0'/></svg>")
+from urllib.parse import quote
+favicon_uri = "data:image/svg+xml," + quote(fav_svg, safe=" ='/:,.-")
+
 open(sys.argv[1] + "/scene.svg", "w", encoding="utf-8").write(svg)
+open(sys.argv[1] + "/favicon.svg", "w", encoding="utf-8").write(fav_svg)
+open(sys.argv[1] + "/favicon-uri.txt", "w", encoding="utf-8").write(favicon_uri)
+open(sys.argv[1] + "/frame-symbol.svg", "w", encoding="utf-8").write(frame_symbol)
+open(sys.argv[1] + "/frame-mask.css.txt", "w", encoding="utf-8").write(frame_mask)
 open(sys.argv[1] + "/rings.svg", "w", encoding="utf-8").write(rings)
 open(sys.argv[1] + "/archline.svg", "w", encoding="utf-8").write(line)
 open(sys.argv[1] + "/preview.html", "w", encoding="utf-8").write(

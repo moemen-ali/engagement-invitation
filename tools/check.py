@@ -8,6 +8,7 @@ Needs `pip install playwright` and an installed Edge or Chrome (or `playwright i
 Exits non-zero if any check fails.
 """
 import sys
+from pathlib import Path
 from urllib.parse import unquote
 
 from playwright.sync_api import sync_playwright
@@ -59,6 +60,15 @@ with sync_playwright() as p:
         check(page.get_attribute("[data-maps]", "href").startswith("https://"), "Maps link set")
         check("calendar.google.com" in page.get_attribute("[data-calendar]", "href"), "calendar link set")
         page.close()
+
+    print("Link preview")
+    page = browser.new_page()
+    page.goto(URL, wait_until="networkidle")
+    og = page.get_attribute('meta[property="og:image"]', "content")
+    check(og.startswith("https://"), f"og:image is an absolute URL ({og})")
+    local = Path(__file__).resolve().parent.parent / og.rsplit("/", 1)[-1]
+    check(local.exists(), f"og:image file exists in the repo ({local.name})")
+    page.close()
 
     print("RSVP flow (375px)")
     page = browser.new_page(viewport={"width": 375, "height": 812})

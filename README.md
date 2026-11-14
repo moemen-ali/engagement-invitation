@@ -5,7 +5,7 @@ Guests open the link (mostly from WhatsApp on a phone) and see the date, venue a
 
 - **Stack:** one static `index.html` (HTML + CSS + vanilla JS). No framework, no build step, no npm, no backend.
 - **Repository:** <https://github.com/moemen-ali/engagement-invitation>
-- **Live site:** <https://moemen-ali.github.io/engagement-invitation/> (GitHub Pages — live once Pages is enabled, see [Before launch](#before-launch-open-items))
+- **Live site:** <https://moemen-alaa.vercel.app/> (Vercel, deployed from `main`)
 
 > **Keep this file current.** Any change to the site's content, behaviour, design, files or decisions must update the
 > relevant section below **and** add an entry to the [Changelog](#changelog), in the same commit.
@@ -52,9 +52,9 @@ All of these values live in one place: the `CONFIG` object at the bottom of `ind
 
 These must be done before the link is sent to guests:
 
-- [ ] **Enable GitHub Pages:** repo **Settings → Pages → Deploy from a branch → `main` / `/ (root)`**. The page's
-      `og:url` and `og:image` already point at `https://moemen-ali.github.io/engagement-invitation/`; if you host elsewhere, change both.
-- [ ] **Check the WhatsApp preview** once live: paste the link into a chat and confirm the card image appears.
+- [x] **Deployed** on Vercel: <https://moemen-alaa.vercel.app/>; `og:url` / `og:image` point there.
+- [ ] **Check the WhatsApp preview:** paste the link into a chat and confirm the card image appears. WhatsApp caches
+      previews per link — if an old text-only preview shows, test with `https://moemen-alaa.vercel.app/?v=2` (any new query string).
 - [x] Link-preview image: the designed card (`og-card.jpg`) with an absolute URL.
 - [ ] **Arabic spelling of Alaa.** The site uses **آلاء** (the standard spelling). If the family writes it الاء,
       change `CONFIG.name2Ar`.
@@ -80,6 +80,7 @@ Opening `index.html` directly from disk also works, but a local server matches p
 ├── index.html                    ← the whole site: markup, CSS, JS, inline SVG art
 ├── stage.jpg                     ← venue stage art shown in the "Under the Arches" frame (900×1200, ~180 KB)
 ├── og-card.jpg                   ← link preview: designed invitation card (1200×630, ~93 KB), from tools/og-card.py
+├── story.jpg                     ← Instagram Story (1080×1920, ~176 KB) in the hero's style, from tools/story.py. Not used by the page
 ├── couple.webp                   ← bride & groom illustration for the Countdown section (786×1200, ~95 KB, transparent)
 ├── stage.png                     ← original source art (1086×1448, 2.6 MB). Not used by the page
 ├── invitation.jfif               ← printed invitation card (736×1104) — style/pose reference only. Not used by the page
@@ -87,6 +88,7 @@ Opening `index.html` directly from disk also works, but a local server matches p
 ├── tools/
 │   ├── stage-art.py              ← generates the hero's inline SVG: stage scene, arch line drawing, rings
 │   ├── og-card.py                ← renders og-card.jpg from CONFIG + the page's art (Playwright)
+│   ├── story.py                  ← renders story.jpg (Instagram Story) from CONFIG + the hero's art (Playwright)
 │   ├── couple-art.py             ← cuts couple.webp out of invitation-2.png's flat background (Pillow + NumPy)
 │   └── check.py                  ← automated browser checks (see "Checks before merging")
 ├── .claude/skills/ui-ux-pro-max/ ← design-intelligence skill for Claude Code (MIT)
@@ -405,10 +407,27 @@ python tools/og-card.py og-card.jpg     # reads CONFIG, the rings SVG and the --
 
 **Re-run it whenever names, date/time, venue, the rings or the stage photo change**, and commit the new image.
 
-`og:image` and `og:url` are absolute (`https://moemen-ali.github.io/engagement-invitation/…`) because WhatsApp ignores relative image URLs.
+`og:image` and `og:url` are absolute (`https://moemen-alaa.vercel.app/…`) because WhatsApp ignores relative image URLs. If the site moves,
+change both — a wrong host means WhatsApp shows a text-only preview (this happened once: the tags pointed at an
+unused GitHub Pages address while the site was on Vercel).
 WhatsApp caches previews per link, so after changing the image an already-shared link may keep the old preview for a while.
 
 (An earlier plain crop of the stage photo, `og-image.jpg`, was replaced by the card and removed.)
+
+## Instagram Story
+
+`story.jpg` is a ready-to-post 1080×1920 story that looks like the hero: lavender sky, string lights, sun glow, rings,
+names in Italianno with the Arabic names, the Arabic invite line, "Invite you to a seaside engagement celebration", the
+date/time, the venue, and the SVG stage scene with roses and sea. No couple illustration (couple's choice).
+
+```bash
+python tools/story.py story.jpg     # reads CONFIG, rings, lights and the stage scene from index.html
+```
+
+- Text sits between y≈290 and y≈1070, clear of Instagram's covered areas (top ~250px profile bar, bottom ~260px
+  reply bar); the arches start at y≈1174.
+- When posting, add a **link sticker** to <https://moemen-alaa.vercel.app/> on the sea band (around y 1550–1700), not over the text.
+- Re-run after changing names, date/time, venue, rings or the stage art.
 
 ## Design skill (ui-ux-pro-max)
 
@@ -452,9 +471,11 @@ Maps/calendar links at 375/768/1280px, and checks that `og:image` is an absolute
 
 Any static host works.
 
-- **GitHub Pages (chosen):** repo **Settings → Pages → Deploy from a branch → `main` / root**. The site will be at
-  <https://moemen-ali.github.io/engagement-invitation/>. Note that Pages serves every file in the repo (including `stage.png`, `tools/`
-  and `.claude/`); that's harmless — nothing secret is stored here — but those files are publicly reachable.
+- **Vercel (in use):** <https://moemen-alaa.vercel.app/>, connected to this repo — every push to `main` redeploys. Vercel serves every
+  file in the repo (including `stage.png`, `tools/`, `.claude/`); that's harmless — nothing secret is stored here — but
+  those files are publicly reachable.
+- **GitHub Pages:** repo **Settings → Pages → Deploy from a branch → `main` / root** would serve it at
+  `https://moemen-ali.github.io/engagement-invitation/` — not used; if you switch, change `og:url`/`og:image`.
 - **Netlify Drop:** drag a folder containing only `index.html`, `stage.jpg`, `couple.webp` and `og-card.jpg` onto
   <https://app.netlify.com/drop> — and change `og:url`/`og:image` to the Netlify address.
 
@@ -501,6 +522,8 @@ Why things are the way they are. Add new decisions at the bottom.
 | 2026-11-14 | Maps link changed to `B5Ygc689t4PCkwjm6` | Couple's updated link (same spot on the Corniche, a few metres away). |
 | 2026-11-14 | A separate printed invitation card is used **only as an art source** — its venue wording ("The Open Air Hall", Gleem) and name order ("Alaa & Mo'men") are **not** used | Couple's instruction: keep The Blue View and "Mo'men & Alaa". (The start time was later confirmed as 4 PM, matching the card.) |
 | 2026-11-14 | Start time changed to **4:00 PM** (end still 7:00 PM, assumed) | Couple's correction. |
+| 2026-11-14 | Hosting on **Vercel** (<https://moemen-alaa.vercel.app/>); `og:url`/`og:image` moved there from the GitHub Pages address | The couple deployed on Vercel; the old tags pointed at a host that wasn't live, so WhatsApp showed no image. |
+| 2026-11-14 | **Instagram Story** rendered from the site's hero (`tools/story.py`), no couple illustration | Couple wanted the story to look like the hero section; building it from the page keeps text crisp (English + Arabic) instead of AI-generated. |
 | 2026-11-14 | Link preview = the **designed card** (`og-card.jpg`), absolute URL on GitHub Pages; `og-image.jpg` removed | The card shows whose event, when and where in the chat; still features the venue stage. Hosting on GitHub Pages (https://moemen-ali.github.io/engagement-invitation/). |
 | 2026-11-14 | Names font changed from Great Vibes to **Italianno** | Couple's request: in Great Vibes the capital M and A read like lowercase letters. Italianno keeps clear capitals and a natural apostrophe in "Mo'men" (Pinyon Script / Parisienne detach it). |
 | 2026-11-14 | RSVP WhatsApp number **+20 111 582 9597** | Couple's number. |
@@ -512,6 +535,9 @@ Why things are the way they are. Add new decisions at the bottom.
 Newest first. Every change to the site adds an entry here.
 
 ### 2026-11-14
+- **WhatsApp preview fixed:** `og:url` / `og:image` now point at the live Vercel site (https://moemen-alaa.vercel.app/); added
+  `og:image:secure_url` and `og:image:type`.
+- **Instagram Story:** added `tools/story.py` and `story.jpg` (1080×1920, hero style, text inside Instagram's safe area).
 - **RSVP removed:** the hero button, the "Will You Join Us?" section and form (and their CSS/JS), `CONFIG.whatsapp`,
   `CONFIG.rsvpBy` and "Kindly RSVP." in the link-preview description. The footer's arch line drawing stays;
   `tools/check.py` no longer runs an RSVP flow.

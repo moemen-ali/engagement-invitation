@@ -376,6 +376,48 @@
             color: var(--soft)
         }
 
+        .couple-arch {
+            width: fit-content;
+            margin: 0 auto 34px;
+            padding: 30px 30px 18px;
+            border-radius: 999px 999px 24px 24px;
+            background: linear-gradient(180deg, #e6e1fb 0%, #dfe5fa 100%);
+            border: 1px solid var(--lilac);
+            box-shadow: var(--shadow)
+        }
+
+        .couple {
+            width: auto;
+            height: clamp(250px, 76vw, 320px)
+        }
+
+        @media (min-width: 860px) {
+            .count-grid {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: 72px;
+                align-items: center;
+                text-align: left
+            }
+
+            .couple-arch {
+                margin: 0;
+                padding: 40px 40px 22px
+            }
+
+            .couple {
+                height: 440px
+            }
+
+            .count-grid .countdown {
+                margin-left: 0
+            }
+
+            .count-grid .unit {
+                text-align: center
+            }
+        }
+
         /* STAGE */
         .stage {
             background: linear-gradient(180deg, var(--pearl), var(--mist))
@@ -888,14 +930,19 @@
     </section>
 
     <!-- COUNTDOWN -->
-    <section>
-        <div class="wrap reveal">
+    <section class="count">
+        <div class="wrap reveal count-grid">
+            <div class="couple-arch"><img class="couple" src="couple.webp" width="755" height="1449" loading="lazy"
+                    alt="Line drawing of a bride in a flowing white gown and a groom in a suit, side by side, seen from behind">
+            </div>
+            <div>
             <p class="eyebrow" data-count-label>Until we meet by the sea</p>
             <div class="countdown" role="timer" aria-live="off">
                 <div class="unit"><b id="d">00</b><small>Days</small></div>
                 <div class="unit"><b id="h">00</b><small>Hours</small></div>
                 <div class="unit"><b id="m">00</b><small>Mins</small></div>
                 <div class="unit"><b id="s">00</b><small>Secs</small></div>
+            </div>
             </div>
         </div>
     </section>
@@ -1048,7 +1095,7 @@
             end: "2026-11-21T19:00:00+02:00",
             venue: "The Blue View",
             address: "Engineers Club, Alexandria",
-            mapsUrl: "https://maps.app.goo.gl/6usG7rS5s6MGmmM66",
+            mapsUrl: "https://maps.app.goo.gl/B5Ygc689t4PCkwjm6",
             stageImage: "stage.jpg",
             whatsapp: "201000000000",             // TODO: real number — country code + number, no + or spaces
             rsvpBy: "18 November"

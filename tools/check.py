@@ -49,6 +49,9 @@ with sync_playwright() as p:
         page.evaluate("document.querySelector('[data-stage]').scrollIntoView()")
         page.wait_for_function("document.querySelector('[data-stage]').complete")
         check(page.evaluate("document.querySelector('[data-stage]').naturalWidth > 0"), "stage image loads")
+        page.evaluate("document.querySelector('.couple').scrollIntoView()")
+        page.wait_for_function("document.querySelector('.couple').complete")
+        check(page.evaluate("document.querySelector('.couple').naturalWidth > 0"), "couple drawing loads")
         small = page.evaluate("""[...document.querySelectorAll('a,button,input:not([type=radio]),select,textarea,.choice label')]
             .map(e => [e.textContent.trim().slice(0, 30) || e.id, Math.round(e.getBoundingClientRect().height)])
             .filter(([, h]) => h && h < 44)""")

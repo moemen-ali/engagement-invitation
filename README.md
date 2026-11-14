@@ -4,6 +4,7 @@ A single-page, mobile-first invitation website for **Mo'men & Alaa's** open-air 
 Guests open the link (mostly from WhatsApp on a phone), see the date, venue and dress code, and RSVP through WhatsApp.
 
 - **Stack:** one static `index.html` (HTML + CSS + vanilla JS). No framework, no build step, no npm, no backend.
+- **Repository:** <https://github.com/moemen-ali/engagement-invitation>
 - **Live site:** _not deployed yet — add the URL here once it is._
 
 > **Keep this file current.** Any change to the site's content, behaviour, design, files or decisions must update the
@@ -41,7 +42,7 @@ Guests open the link (mostly from WhatsApp on a phone), see the date, venue and 
 | Date | Saturday 21 November 2026 |
 | Time | 3:00 PM – 7:00 PM, Cairo time (UTC+02:00) |
 | Venue | The Blue View, Engineers Club, Alexandria |
-| Map | <https://maps.app.goo.gl/6usG7rS5s6MGmmM66> (pin at 31.2392, 29.9532 on the Corniche) |
+| Map | <https://maps.app.goo.gl/B5Ygc689t4PCkwjm6> (pin at 31.239241, 29.953164 on the Corniche) |
 | Setting | Open air, on grass, white sculpted arches with flowers, sea behind the stage |
 | RSVP deadline | 18 November |
 | RSVP channel | WhatsApp message to the number in `CONFIG.whatsapp` |
@@ -60,14 +61,14 @@ These must be done before the link is sent to guests:
       change `CONFIG.name2Ar`.
 - [ ] **End time.** 7:00 PM was assumed (no end time was given). Change `CONFIG.end` if needed.
 - [ ] Add the live URL at the top of this file.
-- [ ] **Couple drawing from the invitation card** (bride and groom seen from behind): planned for the Countdown
-      section; waiting for the image file to be added to the repo (ideally high-resolution / transparent background).
+- [ ] **Groom's suit colour** isn't confirmed, so the suit in the couple drawing is outline only. Once it's decided,
+      add a fill in `tools/couple-art.py` (same way as the dress) and regenerate `couple.webp`.
 
 ## Quick start
 
 ```bash
-git clone <repo-url>
-cd <repo>
+git clone https://github.com/moemen-ali/engagement-invitation.git
+cd engagement-invitation
 python -m http.server 8000      # or: python3 -m http.server 8000
 # open http://localhost:8000
 ```
@@ -82,9 +83,12 @@ Opening `index.html` directly from disk also works, but a local server matches p
 ├── index.html                    ← the whole site: markup, CSS, JS, inline SVG art
 ├── stage.jpg                     ← venue stage art shown in the "Under the Arches" frame (900×1200, ~180 KB)
 ├── og-image.jpg                  ← landscape crop of the stage art for link previews (1200×630, ~105 KB)
+├── couple.webp                   ← bride & groom line drawing for the Countdown section (755×1449, ~130 KB, transparent)
 ├── stage.png                     ← original source art (1086×1448, 2.6 MB). Not used by the page
+├── invitation.jfif               ← printed invitation card (736×1104) — source of the couple drawing only. Not used by the page
 ├── tools/
-│   ├── stage-art.py              ← generates the hero's inline SVG stage scene + arch line-drawing symbol
+│   ├── stage-art.py              ← generates the hero's inline SVG: stage scene, arch line drawing, rings
+│   ├── couple-art.py             ← extracts couple.webp from the invitation card (Pillow + NumPy)
 │   └── check.py                  ← automated browser checks (see "Checks before merging")
 ├── .claude/skills/ui-ux-pro-max/ ← design-intelligence skill for Claude Code (MIT)
 ├── CLAUDE.md                     ← rules for Claude Code (AI assistant) working in this repo
@@ -92,7 +96,7 @@ Opening `index.html` directly from disk also works, but a local server matches p
 └── .gitignore
 ```
 
-Only `index.html`, `stage.jpg` and `og-image.jpg` are needed by the live site. The only external dependency is Google Fonts.
+Only `index.html`, `stage.jpg`, `og-image.jpg` and `couple.webp` are needed by the live site. The only external dependency is Google Fonts.
 
 ## How the page works
 
@@ -157,7 +161,7 @@ const CONFIG = {
     end: "2026-11-21T19:00:00+02:00",
     venue: "The Blue View",
     address: "Engineers Club, Alexandria",
-    mapsUrl: "https://maps.app.goo.gl/6usG7rS5s6MGmmM66",
+    mapsUrl: "https://maps.app.goo.gl/B5Ygc689t4PCkwjm6",
     stageImage: "stage.jpg",
     whatsapp: "201000000000",             // TODO: real number
     rsvpBy: "18 November"
@@ -184,7 +188,9 @@ In order:
    "Together with their families"; names in Great Vibes script with a Cormorant `&`; Arabic names (Amiri); Arabic invite
    line «بكل الحب ندعوكم لمشاركتنا فرحة خطوبتنا»; "Invite you to a seaside engagement celebration"; date line;
    **Kindly RSVP** button (jumps to `#rsvp`); then the **SVG stage scene** (see [Hero stage art](#hero-stage-art-svg-generator)).
-2. **Countdown** — four arch-topped tiles: Days, Hours, Mins, Secs.
+2. **Countdown** — the **couple drawing** (`couple.webp`: bride in a white gown, groom in an outlined suit, seen from
+   behind) inside a soft lavender arch panel, then "Until we meet by the sea" and four arch-topped tiles (Days, Hours,
+   Mins, Secs). Two columns from 860px (drawing left, countdown right); stacked on phones (drawing first).
 3. **Under the Arches** — short venue paragraph + `stage.jpg` in an arch frame (white border, lilac outline ring).
    Two columns from 860px wide (text left, photo right), stacked on phones.
 4. **The Details** — three arch-topped cards with SVG icons: When / Time / Where (+ "Open in Maps"), then an
@@ -294,6 +300,24 @@ and in front of its back wall; the silver's left side shows inside the gold ring
 In the page the SVG is `.rings` (`width: clamp(118px, 30vw, 160px)`), `role="img"` with
 `aria-label="Gold and silver engagement rings"`.
 
+## Couple drawing
+
+`couple.webp` is the bride-and-groom illustration from the printed invitation card (`invitation.jfif`), turned into
+transparent line art that matches the site. [`tools/couple-art.py`](tools/couple-art.py) does it:
+
+```bash
+pip install pillow numpy
+python tools/couple-art.py invitation.jfif couple.webp
+```
+
+- Keeps only what's inside a hand-traced outline of the couple (`COUPLE`), so the card's text, florals, gold and sage
+  wash are dropped; thick leaf blobs on the groom's side and two leftover twig marks (`ERASE`) are removed.
+- Pencil lines become **indigo ink** (`#2e2766`) with soft anti-aliased edges (2× upscale for sharper lines).
+- **Dress: white.** The card's pink watercolour plus a solid skirt shape (`SKIRT`) and the bodice (`BODICE`) become a
+  soft white wash. (The card shows it pink; the couple confirmed the dress is white.)
+- **Suit: outline only** (the `GROOM` area is never filled) until the colour is confirmed — then add a fill there.
+- The page shows it in `.couple-arch` (lavender gradient arch, so the white dress stands out), with descriptive `alt`.
+
 ## Images
 
 | File | Size | Use |
@@ -301,6 +325,8 @@ In the page the SVG is `.rings` (`width: clamp(118px, 30vw, 160px)`), `role="img
 | `stage.png` | 1086×1448, 2.6 MB | original source art — keep it, edit/export from it |
 | `stage.jpg` | 900×1200, ~180 KB, JPEG q80 progressive | stage section photo (must stay ≤ 400 KB) |
 | `og-image.jpg` | 1200×630, ~105 KB | WhatsApp / social link preview (arches + sea crop) |
+| `couple.webp` | 755×1449, ~130 KB, WebP with alpha | couple drawing in the Countdown section (see above) |
+| `invitation.jfif` | 736×1104, JPEG | printed card — source for `couple.webp` only; its event details are **not** used |
 
 To regenerate both from the source (requires Pillow):
 
@@ -336,7 +362,7 @@ Manual checklist — every change:
 
 - [ ] Page loads with **no console errors**.
 - [ ] Countdown is ticking.
-- [ ] Stage image shows inside the arch frame; hero stage art renders.
+- [ ] Stage image shows inside the arch frame; hero stage art, rings and the couple drawing render.
 - [ ] "Open in Maps", "Add to calendar" and "Send RSVP via WhatsApp" open the correct links/message.
 - [ ] Layout holds at **375px**, **768px** and **1280px** (no horizontal scrolling).
 - [ ] Text contrast still ≥ 4.5:1 if colours changed; focus states still visible.
@@ -399,6 +425,9 @@ Why things are the way they are. Add new decisions at the bottom.
 | 2026-11-14 | Skill's pink palette and "testimonials" page pattern **rejected** | Pink is off-brand; testimonials make no sense for an invitation. |
 | 2026-11-14 | Decorative "rounded line bundles" background in every section **tried and reverted** | The couple didn't like the look. Don't reintroduce without showing a mock-up first. |
 | 2026-11-14 | **Interlocked gold + silver flat-profile rings** at the top of the hero | Couple's request, modelled on a plain flat gold band (not rounded). |
+| 2026-11-14 | **Couple drawing** from the invitation card placed in the **Countdown** section | A couple looking ahead suits "Until we meet by the sea", and it was the sparsest section. RSVP (pushes the form down on phones) and footer (low visibility) were rejected. |
+| 2026-11-14 | Dress **white**; suit **outline only** | Couple's instruction — the suit colour isn't confirmed yet. |
+| 2026-11-14 | Maps link changed to `B5Ygc689t4PCkwjm6` | Couple's updated link (same spot on the Corniche, a few metres away). |
 | 2026-11-14 | A separate printed invitation card is used **only as an art source** — its details (4 PM, "The Open Air Hall", Gleem, "Alaa & Mo'men" order) are **not** used | Couple's instruction: keep the site's details (3 PM, The Blue View, "Mo'men & Alaa"). |
 
 ## Changelog
@@ -406,6 +435,10 @@ Why things are the way they are. Add new decisions at the bottom.
 Newest first. Every change to the site adds an entry here.
 
 ### 2026-11-14
+- **Couple drawing:** added `couple.webp` (from the invitation card via `tools/couple-art.py`: indigo line art, white
+  dress, outlined suit) in a lavender arch beside/above the countdown.
+- **Maps link** updated to <https://maps.app.goo.gl/B5Ygc689t4PCkwjm6>.
+- **Repository** published at <https://github.com/moemen-ali/engagement-invitation>.
 - **Rings:** added interlocked gold and silver flat-profile rings (SVG) above "Together with their families" in the
   hero; generated by `tools/stage-art.py` (`rings.svg`) with geometrically computed crossings.
 - **Repo set up for collaboration:** added this README (full context), `.gitignore`, `tools/check.py`, and a rule in

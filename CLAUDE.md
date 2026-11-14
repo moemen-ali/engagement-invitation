@@ -2,7 +2,7 @@
 
 A single-page invitation website for an open-air engagement party by the sea.
 The party is at 3 PM on Saturday 21 November 2026, Cairo time (UTC+02:00),
-at **The Blue View, Engineers Club, Alexandria** ([Maps](https://maps.app.goo.gl/6usG7rS5s6MGmmM66)).
+at **The Blue View, Engineers Club, Alexandria** ([Maps](https://maps.app.goo.gl/B5Ygc689t4PCkwjm6)).
 
 ## Keep README.md up to date (required)
 
@@ -27,9 +27,12 @@ Don't say a change is done until README.md reflects it.
 ├── index.html     ← the whole site: markup, CSS and JS in one file
 ├── stage.jpg      ← illustrated venue stage art, optimized (portrait, 900×1200, ~180 KB)
 ├── og-image.jpg   ← landscape crop of the stage art for link previews (1200×630)
+├── couple.webp    ← bride & groom line drawing (Countdown section), made by tools/couple-art.py
+├── invitation.jfif ← printed invitation card: art source for couple.webp only. Not used by the page
 ├── stage.png      ← original source art (1086×1448, 2.6 MB). Not used by the page; don't ship it
 ├── tools/stage-art.py          ← generates the hero's inline SVG stage art (see "Hero art" below). Not shipped
 ├── tools/check.py              ← automated browser checks (Playwright). Not shipped
+├── tools/couple-art.py         ← extracts couple.webp from the card (Pillow + NumPy). Not shipped
 └── .claude/skills/ui-ux-pro-max ← design-intelligence skill (MIT, nextlevelbuilder/ui-ux-pro-max-skill). Not shipped
 ```
 
@@ -54,7 +57,8 @@ Never hard-code these values in the markup.
 ## Sections (in order)
 
 1. **Hero**: lavender sky gradient, soft sun glow (top right), festoon string lights, interlocked gold + silver flat-profile rings (SVG), names in script with the Arabic names below, Arabic invite line, date, a "Kindly RSVP" button, then the SVG stage scene (wavy central arch + two side arches with cascading roses, in front of a blue sea with drifting swell lines).
-2. **Countdown**: days, hours, minutes and seconds to `CONFIG.start`.
+2. **Countdown**: the couple drawing (`couple.webp`) in a lavender arch panel, then days, hours, minutes and seconds to `CONFIG.start`.
+   The dress is **white**; the groom's suit stays **outline only** until its colour is confirmed (then add a fill in `tools/couple-art.py`).
 3. **Stage ("Under the Arches")**: `stage.jpg` in an arch-shaped frame. The frame's aspect ratio matches the image (900/1200), so update it if the image changes.
 4. **Details**: three arch-topped cards with SVG icons (When / Time / Where), a Maps link and an "Add to calendar" button (Google Calendar link).
 5. **Dress code ("Coastal Chic")**: labelled palette swatches and tip pills with SVG icons.
@@ -156,9 +160,11 @@ Before sharing the link:
 - Set `CONFIG.whatsapp` to the real number.
 - Change `og:image` to an absolute URL (e.g. `https://<site>/og-image.jpg`). WhatsApp ignores relative image URLs.
 - The favicon is an inline SVG data URI (a small lilac arch with two roses) in `<head>`.
-- For Netlify Drop, upload only `index.html`, `stage.jpg` and `og-image.jpg`.
+- For Netlify Drop, upload only `index.html`, `stage.jpg`, `og-image.jpg` and `couple.webp`.
 
 ## Git
+
+Remote: <https://github.com/moemen-ali/engagement-invitation> (`origin`).
 
 - `main` is what gets deployed. Work on a branch and open a PR; one logical change per PR.
 - Commit or push only when the user asks.

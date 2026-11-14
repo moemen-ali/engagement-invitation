@@ -30,7 +30,7 @@ mask = re.search(r"--venue-arch: (url\(.*?\));", page, re.S).group(1)
 symbol = re.search(r'<symbol id="venueArch".*?</symbol>', page, re.S).group(0)
 
 html = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Amiri&family=Cormorant+Garamond:ital@0;1&family=Great+Vibes&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri&family=Cormorant+Garamond:ital@0;1&family=Italianno&family=Jost:wght@400;500&display=swap" rel="stylesheet">
 <style>
   * {{ margin: 0; box-sizing: border-box }}
   body {{ width: 1200px; height: 630px; overflow: hidden; display: flex; align-items: center; gap: 64px; padding: 0 70px 0 92px;
@@ -43,7 +43,7 @@ html = f"""<!DOCTYPE html><html><head><meta charset="utf-8">
   .text {{ flex: 1; text-align: center }}
   .rings {{ width: 132px; height: auto; display: block; margin: 0 auto 6px }}
   .eyebrow {{ font-weight: 500; font-size: 17px; letter-spacing: .32em; text-transform: uppercase; color: #6a4cc4 }}
-  h1 {{ font: 400 104px/1.05 'Great Vibes', cursive; margin: 6px 0 0; white-space: nowrap }}
+  h1 {{ font: 400 128px/1 'Italianno', cursive; margin: 6px 0 0; white-space: nowrap }}
   h1 span {{ font: italic 400 52px 'Cormorant Garamond', serif; color: #6a4cc4; padding: 0 .32em }}
   .ar {{ font: 34px Amiri, serif; direction: rtl; margin-top: 2px }}
   .rule {{ width: 120px; height: 1px; background: #6a4cc4; opacity: .4; margin: 18px auto }}

@@ -9,7 +9,6 @@ Exits non-zero if any check fails.
 """
 import sys
 from pathlib import Path
-from urllib.parse import unquote
 
 from playwright.sync_api import sync_playwright
 
@@ -70,18 +69,6 @@ with sync_playwright() as p:
     check(local.exists(), f"og:image file exists in the repo ({local.name})")
     page.close()
 
-    print("RSVP flow (375px)")
-    page = browser.new_page(viewport={"width": 375, "height": 812})
-    page.goto(URL, wait_until="networkidle")
-    page.evaluate("window.open = u => { window.__opened = u }")
-    page.click("button[type=submit]")
-    check(page.is_visible("#f-name-err") and not page.evaluate("window.__opened || null"), "empty name shows error, no WhatsApp")
-    page.fill("#f-name", "Test Guest"); page.select_option("#f-guests", "2"); page.fill("#f-msg", "Mabrook!")
-    page.click("button[type=submit]")
-    opened = page.evaluate("window.__opened || ''")
-    check(opened.startswith("https://wa.me/"), "opens wa.me link")
-    if "text=" in opened:
-        print("\n".join("        " + line for line in unquote(opened.split("text=")[1]).splitlines()))
     browser.close()
 
 print("\nAll checks passed." if not failures else f"\n{len(failures)} check(s) failed.")

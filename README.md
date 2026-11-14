@@ -1,7 +1,7 @@
 # Mo'men & Alaa — Engagement Invitation Website
 
 A single-page, mobile-first invitation website for **Mo'men & Alaa's** open-air engagement party by the sea.
-Guests open the link (mostly from WhatsApp on a phone), see the date, venue and dress code, and RSVP through WhatsApp.
+Guests open the link (mostly from WhatsApp on a phone) and see the date, venue and dress code. There is no RSVP on the site.
 
 - **Stack:** one static `index.html` (HTML + CSS + vanilla JS). No framework, no build step, no npm, no backend.
 - **Repository:** <https://github.com/moemen-ali/engagement-invitation>
@@ -44,8 +44,7 @@ Guests open the link (mostly from WhatsApp on a phone), see the date, venue and 
 | Venue | The Blue View, Engineers Club, Alexandria |
 | Map | <https://maps.app.goo.gl/B5Ygc689t4PCkwjm6> (pin at 31.239241, 29.953164 on the Corniche) |
 | Setting | Open air, on grass, white sculpted arches with flowers, sea behind the stage |
-| RSVP deadline | 18 November |
-| RSVP channel | WhatsApp message to the number in `CONFIG.whatsapp` |
+| RSVP | none on the site (removed at the couple's request) |
 
 All of these values live in one place: the `CONFIG` object at the bottom of `index.html` (see [Editing guide](#editing-guide-common-tasks)).
 
@@ -53,8 +52,6 @@ All of these values live in one place: the `CONFIG` object at the bottom of `ind
 
 These must be done before the link is sent to guests:
 
-- [ ] **WhatsApp number.** `CONFIG.whatsapp` is still the placeholder `201000000000`, so RSVPs go nowhere.
-      Format: country code + number, no `+`, no spaces, no leading zero (e.g. `2010XXXXXXXX`).
 - [ ] **Enable GitHub Pages:** repo **Settings → Pages → Deploy from a branch → `main` / `/ (root)`**. The page's
       `og:url` and `og:image` already point at `https://moemen-ali.github.io/engagement-invitation/`; if you host elsewhere, change both.
 - [ ] **Check the WhatsApp preview** once live: paste the link into a chat and confirm the card image appears.
@@ -115,7 +112,6 @@ small script fills them from `CONFIG` on load:
 | `data-weekday`, `data-date-long` | `Saturday`, `21 November 2026` |
 | `data-time`, `data-until` | `4:00 PM`, `Until 7:00 PM` |
 | `data-venue`, `data-address` | venue name, address |
-| `data-rsvp-by` | RSVP deadline text |
 | `data-date-dots` | `21 · 11 · 2026` (footer) |
 | `data-stage` | `src` of the stage image |
 | `data-maps` | `href` of "Open in Maps" |
@@ -135,15 +131,6 @@ with `timeZone: 'Africa/Cairo'`. Guests abroad still see Cairo time. Keep it tha
 - **Countdown:** ticks every second to `CONFIG.start`; at zero it shows `00` and the heading changes to "Today's the day".
   It uses `role="timer"` with `aria-live="off"` so screen readers aren't spammed every second.
 - **Add to calendar:** Google Calendar link with title, UTC start/end, location and the Maps link in the details.
-- **RSVP:** no backend. On submit, the form builds a message and opens `https://wa.me/<number>?text=…`:
-  ```
-  RSVP — Mo'men & Alaa's engagement
-  Name: <name>
-  Joyfully yes ✨ | Sadly no
-  Guests: <1–4>
-  Note: <optional note>
-  ```
-  If the name is empty, an inline error appears under the field and focus moves there; it clears as you type.
 - **Scroll reveal:** sections fade/slide in once (`.reveal` → `.in` via `IntersectionObserver`). The `js` class on
   `<html>` gates this, so content stays visible if JavaScript fails.
 - **Reduced motion:** with `prefers-reduced-motion: reduce`, reveal, sea swell, bulb glow, button motion and smooth
@@ -164,21 +151,16 @@ const CONFIG = {
     venue: "The Blue View",
     address: "Engineers Club, Alexandria",
     mapsUrl: "https://maps.app.goo.gl/B5Ygc689t4PCkwjm6",
-    stageImage: "stage.jpg",
-    whatsapp: "201000000000",             // TODO: real number
-    rsvpBy: "18 November"
+    stageImage: "stage.jpg"
 };
 ```
 
 | Task | What to change |
 |---|---|
-| Set the RSVP WhatsApp number | `whatsapp` (country code + number, no `+`/spaces/leading zero) |
 | Change date or time | `start` / `end` (keep `+02:00`), then the `<head>` meta text, then the event table in this README |
 | Change venue or map | `venue`, `address`, `mapsUrl`, then the `<head>` meta text |
 | Change names | `name1`, `name2`, `name1Ar`, `name2Ar`, then `<title>`, `og:title`, `description`, footer is automatic |
-| Change RSVP deadline | `rsvpBy` (must be **before** the event date) |
 | Replace the stage photo | see [Images](#images); update `stageImage` and the `.arch` `aspect-ratio` if the ratio changes |
-| Change guest-count options | the `<select id="f-guests">` options in the RSVP form |
 | Change dress-code tips | the `.pills` list in the Dress code section (keep the SVG icon + text pattern) |
 
 ## Page sections
@@ -187,9 +169,9 @@ In order:
 
 1. **Hero** — lavender sky gradient, soft sun glow (top right), festoon string lights with glowing bulbs; a pair of
    **interlocked gold and silver rings** (flat-profile bands, SVG); eyebrow
-   "Together with their families"; names in Great Vibes script with a Cormorant `&`; Arabic names (Amiri); Arabic invite
+   "Together with their families"; names in Italianno script with a Cormorant `&`; Arabic names (Amiri); Arabic invite
    line «بكل الحب ندعوكم لمشاركتنا فرحة خطوبتنا»; "Invite you to a seaside engagement celebration"; date line;
-   **Kindly RSVP** button (jumps to `#rsvp`); then the **SVG stage scene** (see [Hero stage art](#hero-stage-art-svg-generator)).
+   then the **SVG stage scene** (see [Hero stage art](#hero-stage-art-svg-generator)).
 2. **Countdown** — the **couple illustration** (`couple.webp`: bride in a white gown, groom in a dark grey suit, seen
    from behind) on a lavender panel cut to the **venue-arch shape**, then "Until we meet by the sea" and four arch-topped tiles (Days, Hours,
    Mins, Secs) also cut to the venue-arch shape. Two columns from 860px (drawing left, countdown right); stacked on phones (drawing first).
@@ -200,11 +182,10 @@ In order:
    **Add to calendar** button.
 5. **Coastal Chic** (dress code) — five labelled arch swatches (Pearl, Lilac, Periwinkle, Sea blue, Indigo) and three
    tip pills with icons: sunglasses welcome; flats or block heels (it's on grass); a light layer for the sea breeze.
-6. **Will You Join Us?** (RSVP, `id="rsvp"`) — name, attending (Joyfully yes / Sadly no), number of guests (1–4),
-   optional note, **Send RSVP via WhatsApp**. A faint line drawing of the central arch sits behind the form.
-7. **Footer** — names in script, Arabic names, «في انتظاركم», date as `21 · 11 · 2026`, faint arch line drawing.
+6. **Footer** — names in script, Arabic names, «في انتظاركم», date as `21 · 11 · 2026`, faint arch line drawing.
 
-"Our Story" and "Morning Plan" (timeline) sections were **intentionally removed** — do not add them back.
+"Our Story" and "Morning Plan" (timeline) sections and the **RSVP** (hero button + "Will You Join Us?" form) were
+**intentionally removed** — do not add them back.
 
 ## Design system
 
@@ -232,7 +213,7 @@ violet on white 6.1, white on violet 6.1, soft on lilac 4.8 (tightest). Re-check
 
 | Role | Font | Notes |
 |---|---|---|
-| Couple's names | Great Vibes | script; only for names (hero h1, footer) |
+| Couple's names | Italianno | script with clearly capital letters (M, A); only for names (hero h1, footer, preview card) |
 | Headings | Cormorant Garamond 400 | italic for accents (`&`, date line, captions) |
 | Body | Jost 300, 1rem, line-height 1.7 | |
 | Labels / eyebrows | Jost 500, uppercase, letter-spacing .2–.35em | never smaller than .75rem |
@@ -249,10 +230,8 @@ No emoji as icons.
 
 **Interaction & accessibility**
 
-- Buttons, inputs, choices and links are ≥ 44px tall; form text is 1rem so iOS Safari doesn't zoom on focus.
-- Visible focus: 2px indigo outline on links/buttons, violet ring on inputs, outline on the focused radio choice.
-- Every form field has a `<label>`; the attending choice is a `<fieldset>` labelled by its heading; radios are
-  visually hidden but keyboard-accessible.
+- Buttons and links are ≥ 44px tall.
+- Visible focus: 2px indigo outline on links and buttons.
 - Images have `alt`; decorative SVGs are `aria-hidden`; swatches have visible names (not colour-only).
 
 **Motion:** gentle only — scroll reveal (0.7s), sea swell drift (10s), bulb glow (3.2s). All off under reduced motion.
@@ -283,7 +262,7 @@ python tools/stage-art.py out/          # writes out/scene.svg, out/archline.svg
 Then replace in `index.html`:
 - the `<svg class="scene" …>…</svg>` block with `scene.svg`;
 - the `<symbol id="archLine" …>…</symbol>` (inside the hidden sprite at the top of `<body>`) with `archline.svg`
-  — this is the faint arch line drawing used behind the RSVP form and footer;
+  — this is the faint arch line drawing used behind the footer;
 - the `<svg class="rings" …>…</svg>` block (top of the hero `.intro`) with `rings.svg`.
 
 `preview.html` lets you look at the art on its own first. Layout rules:
@@ -453,7 +432,7 @@ Manual checklist — every change:
 - [ ] Page loads with **no console errors**.
 - [ ] Countdown is ticking.
 - [ ] Stage image shows inside the arch frame; hero stage art, rings and the couple drawing render.
-- [ ] "Open in Maps", "Add to calendar" and "Send RSVP via WhatsApp" open the correct links/message.
+- [ ] "Open in Maps" and "Add to calendar" open the correct links.
 - [ ] Layout holds at **375px**, **768px** and **1280px** (no horizontal scrolling).
 - [ ] Text contrast still ≥ 4.5:1 if colours changed; focus states still visible.
 - [ ] Try it with reduced motion on if you touched animation.
@@ -466,8 +445,8 @@ python -m http.server 8000 &          # in another terminal on Windows
 python tools/check.py http://localhost:8000/
 ```
 
-It reports console errors, countdown ticking, horizontal overflow, image loading and tap targets under 44px at
-375/768/1280px, and runs the RSVP flow (empty-name error, then the generated WhatsApp message).
+It reports console errors, countdown ticking, horizontal overflow, image loading, tap targets under 44px and the
+Maps/calendar links at 375/768/1280px, and checks that `og:image` is an absolute URL to a file in the repo.
 
 ## Deployment
 
@@ -484,14 +463,14 @@ After deploying: paste the link into a WhatsApp chat to check the preview, and c
 
 ## Collaboration workflow
 
-- `main` is what gets deployed. Make changes on a branch (`fix/rsvp-copy`, `feat/arabic-dress-code`, …) and open a PR.
+- `main` is what gets deployed. Make changes on a branch (`fix/dress-code-copy`, `feat/arabic-details`, …) and open a PR.
 - One logical change per PR. Describe what changed and include phone-width screenshots for visual changes.
 - Run the [checks](#checks-before-merging) before asking for review.
 - **Update this README in the same PR** (relevant section + a [Changelog](#changelog) entry with date, what and why).
 - Design decisions (colours, sections, wording) belong to the couple; record them in the [Decision log](#decision-log).
 - Hard rules (also in `CLAUDE.md`):
   - Keep everything in `index.html`; no frameworks, build steps or npm.
-  - No backend — RSVPs go through WhatsApp.
+  - No backend, no forms, no RSVP (removed at the couple's request).
   - No trackers, analytics or cookie banners.
   - English first, with Arabic alongside (never replacing English).
   - Mobile-first: check 375px before anything else.
@@ -523,6 +502,9 @@ Why things are the way they are. Add new decisions at the bottom.
 | 2026-11-14 | A separate printed invitation card is used **only as an art source** — its venue wording ("The Open Air Hall", Gleem) and name order ("Alaa & Mo'men") are **not** used | Couple's instruction: keep The Blue View and "Mo'men & Alaa". (The start time was later confirmed as 4 PM, matching the card.) |
 | 2026-11-14 | Start time changed to **4:00 PM** (end still 7:00 PM, assumed) | Couple's correction. |
 | 2026-11-14 | Link preview = the **designed card** (`og-card.jpg`), absolute URL on GitHub Pages; `og-image.jpg` removed | The card shows whose event, when and where in the chat; still features the venue stage. Hosting on GitHub Pages (https://moemen-ali.github.io/engagement-invitation/). |
+| 2026-11-14 | Names font changed from Great Vibes to **Italianno** | Couple's request: in Great Vibes the capital M and A read like lowercase letters. Italianno keeps clear capitals and a natural apostrophe in "Mo'men" (Pinyon Script / Parisienne detach it). |
+| 2026-11-14 | RSVP WhatsApp number **+20 111 582 9597** | Couple's number. |
+| 2026-11-14 | **RSVP removed entirely** (hero "Kindly RSVP" button, "Will You Join Us?" form, WhatsApp number and deadline) | Couple's decision. |
 | 2026-11-14 | Countdown tiles and detail cards also use the **venue-arch shape** | Couple's request: everything framed should match the venue stage. |
 
 ## Changelog
@@ -530,6 +512,11 @@ Why things are the way they are. Add new decisions at the bottom.
 Newest first. Every change to the site adds an entry here.
 
 ### 2026-11-14
+- **RSVP removed:** the hero button, the "Will You Join Us?" section and form (and their CSS/JS), `CONFIG.whatsapp`,
+  `CONFIG.rsvpBy` and "Kindly RSVP." in the link-preview description. The footer's arch line drawing stays;
+  `tools/check.py` no longer runs an RSVP flow.
+- **Names font** is now **Italianno** (clear capital M and A) in the hero, footer and link-preview card (re-rendered).
+- **WhatsApp number** set: RSVPs now go to +20 111 582 9597.
 - **Favicon** redrawn as the venue's central arch with roses (generated by `tools/stage-art.py`).
 - **Link preview:** now the designed card `og-card.jpg` (rendered by `tools/og-card.py`), with absolute `og:image`
   and `og:url` on https://moemen-ali.github.io/engagement-invitation/; removed `og-image.jpg`. `tools/check.py` checks og:image is absolute and present.
@@ -564,6 +551,6 @@ Newest first. Every change to the site adds an entry here.
 
 ## Credits and licences
 
-- Fonts via Google Fonts (SIL Open Font License): Great Vibes, Cormorant Garamond, Jost, Amiri.
+- Fonts via Google Fonts (SIL Open Font License): Italianno, Cormorant Garamond, Jost, Amiri.
 - `ui-ux-pro-max` skill © 2024 Next Level Builder, MIT licence (see `.claude/skills/ui-ux-pro-max/LICENSE`).
 - Stage illustration (`stage.png` and derivatives) provided by the couple for this invitation.

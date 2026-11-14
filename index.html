@@ -14,7 +14,7 @@
     <meta property="og:url" content="https://moemen-ali.github.io/engagement-invitation/">
     <meta property="og:title" content="Mo'men &amp; Alaa — Engagement by the Sea">
     <meta property="og:description"
-        content="Saturday 21 November 2026 · 4 PM · The Blue View, Engineers Club, Alexandria. Kindly RSVP.">
+        content="Saturday 21 November 2026 · 4 PM · The Blue View, Engineers Club, Alexandria.">
     <meta property="og:image" content="https://moemen-ali.github.io/engagement-invitation/og-card.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -26,7 +26,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Great+Vibes&family=Jost:wght@300;400;500&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Italianno&family=Jost:wght@300;400;500&display=swap"
         rel="stylesheet">
     <style>
         :root {
@@ -87,7 +87,7 @@
         }
 
         .script {
-            font-family: 'Great Vibes', cursive;
+            font-family: 'Italianno', cursive;
             font-weight: 400
         }
 
@@ -273,8 +273,8 @@
             justify-content: center;
             align-items: baseline;
             column-gap: .18em;
-            font-family: 'Great Vibes', cursive;
-            font-size: clamp(3.5rem, 14vw, 7.4rem);
+            font-family: 'Italianno', cursive;
+            font-size: clamp(4.3rem, 17vw, 9rem);
             line-height: 1.1;
             color: var(--indigo);
             margin: 16px 0 2px
@@ -314,10 +314,6 @@
             font-size: 1.35rem;
             color: var(--indigo);
             margin-top: 6px
-        }
-
-        .intro .btn {
-            margin-top: 26px
         }
 
         .scene-wrap {
@@ -649,16 +645,10 @@
             color: var(--violet)
         }
 
-        /* RSVP */
-        .rsvp {
-            background: linear-gradient(180deg, var(--pearl), #e4e6fb);
-            overflow: hidden
-        }
-
+        /* faint line drawing of the venue's central arch (footer) */
         .bg-arch {
             position: absolute;
             left: 50%;
-            bottom: -40px;
             width: min(760px, 150vw);
             aspect-ratio: 500/560;
             transform: translateX(-50%);
@@ -667,152 +657,13 @@
             pointer-events: none
         }
 
-        .form-card {
-            max-width: 480px;
-            margin: 36px auto 0;
-            background: var(--white);
-            border: 1px solid var(--lilac);
-            border-radius: 28px;
-            padding: 30px 22px;
-            text-align: left;
-            box-shadow: 0 24px 60px -34px rgba(46, 39, 102, .55)
-        }
-
-        .form-card .l {
-            display: block;
-            letter-spacing: .2em;
-            font-size: .75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            color: var(--soft);
-            margin: 20px 0 8px
-        }
-
-        .form-card .l:first-child {
-            margin-top: 0
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            min-height: 50px;
-            padding: 12px 16px;
-            border: 1.5px solid #dcd6f5;
-            border-radius: 14px;
-            background: #fcfbff;
-            font: 400 1rem 'Jost', sans-serif;
-            color: var(--ink);
-            outline: none;
-            transition: border-color .2s ease, box-shadow .2s ease
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical
-        }
-
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236a4cc4' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            background-size: 18px;
-            padding-right: 44px
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--violet);
-            box-shadow: 0 0 0 4px rgba(106, 76, 196, .18)
-        }
-
-        input[aria-invalid="true"] {
-            border-color: #b4235a
-        }
-
-        .err {
-            display: none;
-            margin-top: 6px;
-            font-size: .85rem;
-            font-weight: 400;
-            color: #b4235a
-        }
-
-        .err.show {
-            display: block
-        }
-
-        fieldset.choice {
-            border: 0;
-            min-width: 0;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px
-        }
-
-        .choice label {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 50px;
-            border-radius: 14px;
-            border: 1.5px solid #dcd6f5;
-            cursor: pointer;
-            font-weight: 400;
-            transition: background .2s ease, border-color .2s ease, color .2s ease
-        }
-
-        .choice input {
-            position: absolute;
-            opacity: 0;
-            width: 1px;
-            height: 1px;
-            min-height: 0
-        }
-
-        .choice label:hover {
-            border-color: var(--violet)
-        }
-
-        .choice label:has(input:checked) {
-            background: var(--violet);
-            border-color: var(--violet);
-            color: var(--white)
-        }
-
-        .choice label:has(input:focus-visible) {
-            outline: 2px solid var(--indigo);
-            outline-offset: 2px
-        }
-
-        .form-card .btn {
-            width: 100%;
-            margin-top: 28px
-        }
-
-        .hint {
-            text-align: center;
-            font-size: .85rem;
-            color: var(--soft);
-            margin-top: 12px
-        }
-
-        @media (min-width: 560px) {
-            .form-card {
-                padding: 40px 36px
-            }
-        }
-
         /* FOOTER */
         footer {
             position: relative;
             overflow: hidden;
             padding: 90px 24px 80px;
             text-align: center;
-            background: linear-gradient(180deg, #e4e6fb, #d8dcf8)
+            background: linear-gradient(180deg, var(--pearl), #d8dcf8)
         }
 
         footer .bg-arch {
@@ -828,7 +679,7 @@
         }
 
         footer .script {
-            font-size: clamp(2.8rem, 10vw, 3.6rem);
+            font-size: clamp(3.4rem, 12vw, 4.4rem);
             line-height: 1.2;
             color: var(--indigo)
         }
@@ -936,7 +787,6 @@
             <p class="ar invite-ar">بكل الحب ندعوكم لمشاركتنا فرحة خطوبتنا</p>
             <p class="tag">Invite you to a seaside engagement celebration</p>
             <p class="when" data-when></p>
-            <a href="#rsvp" class="btn">Kindly RSVP</a>
         </div>
 
         <div class="scene-wrap">
@@ -1095,42 +945,6 @@
         </div>
     </section>
 
-    <!-- RSVP -->
-    <section class="rsvp" id="rsvp">
-        <svg class="bg-arch" aria-hidden="true" focusable="false">
-            <use href="#archLine" />
-        </svg>
-        <div class="wrap reveal">
-            <p class="eyebrow">Please reply by <span data-rsvp-by></span></p>
-            <h2 class="title">Will You Join Us?</h2>
-            <form class="form-card" id="rsvpForm" novalidate>
-                <label class="l" for="f-name">Your name</label>
-                <input id="f-name" name="name" required autocomplete="name" placeholder="Full name"
-                    aria-describedby="f-name-err">
-                <p class="err" id="f-name-err">Please add your name so we know who's coming.</p>
-                <p class="l" id="f-attend">Attending?</p>
-                <fieldset class="choice" aria-labelledby="f-attend">
-                    <label><input type="radio" name="attend" value="Joyfully yes ✨" checked>Joyfully yes</label>
-                    <label><input type="radio" name="attend" value="Sadly no">Sadly no</label>
-                </fieldset>
-                <label class="l" for="f-guests">Number of guests</label>
-                <select id="f-guests" name="guests">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                </select>
-                <label class="l" for="f-msg">A note for the couple (optional)</label>
-                <textarea id="f-msg" name="msg" rows="3" placeholder="Your wishes…"></textarea>
-                <button class="btn" type="submit">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5z" />
-                    </svg>Send RSVP via WhatsApp</button>
-                <p class="hint">This opens WhatsApp with your reply ready to send.</p>
-            </form>
-        </div>
-    </section>
-
     <footer>
         <svg class="bg-arch" aria-hidden="true" focusable="false">
             <use href="#archLine" />
@@ -1153,9 +967,7 @@
             venue: "The Blue View",
             address: "Engineers Club, Alexandria",
             mapsUrl: "https://maps.app.goo.gl/B5Ygc689t4PCkwjm6",
-            stageImage: "stage.jpg",
-            whatsapp: "201000000000",             // TODO: real number — country code + number, no + or spaces
-            rsvpBy: "18 November"
+            stageImage: "stage.jpg"
         };
         /* ============================= */
 
@@ -1176,7 +988,6 @@
         set('[data-until]', `Until ${time(end)}`);
         set('[data-venue]', CONFIG.venue);
         set('[data-address]', CONFIG.address);
-        set('[data-rsvp-by]', CONFIG.rsvpBy);
         set('[data-date-dots]', start.toLocaleDateString('en-GB', { ...tz, day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('  ·  '));
         document.querySelector('[data-stage]').src = CONFIG.stageImage;
         document.querySelector('[data-maps]').href = CONFIG.mapsUrl;
@@ -1196,17 +1007,6 @@
         }
         tick(); timer = setInterval(tick, 1000);
 
-        const form = document.getElementById('rsvpForm'), nameInput = form.elements.name, nameErr = document.getElementById('f-name-err');
-        const showNameError = on => { nameInput.setAttribute('aria-invalid', on); nameErr.classList.toggle('show', on); };
-        nameInput.addEventListener('input', () => nameInput.value.trim() && showNameError(false));
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            const f = new FormData(form);
-            if (!f.get('name').trim()) { showNameError(true); nameInput.focus(); return; }
-            const msg = `RSVP — ${CONFIG.name1} & ${CONFIG.name2}'s engagement\nName: ${f.get('name').trim()}\n${f.get('attend')}\nGuests: ${f.get('guests')}` +
-                (f.get('msg').trim() ? `\nNote: ${f.get('msg').trim()}` : '');
-            window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
-        });
 
         const io = new IntersectionObserver(es => es.forEach(x => x.isIntersecting && x.target.classList.add('in')), { threshold: .15 });
         document.querySelectorAll('.reveal').forEach(el => io.observe(el));

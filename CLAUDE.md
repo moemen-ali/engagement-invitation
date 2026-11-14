@@ -39,13 +39,13 @@ Don't say a change is done until README.md reflects it.
 ```
 
 - Keep the site **self-contained in `index.html`**. No build step, no framework, no npm.
-- The only external dependency is Google Fonts (Great Vibes, Cormorant Garamond, Jost, Amiri).
+- The only external dependency is Google Fonts (Italianno, Cormorant Garamond, Jost, Amiri).
 - If the stage image is renamed or converted (e.g. to `.webp`), update `CONFIG.stageImage`.
 
 ## Editing content
 
 All event details live in the `CONFIG` object at the bottom of `index.html`:
-names (English and Arabic: `name1Ar`/`name2Ar`), start/end time, venue, address, Maps URL, stage image path, WhatsApp number and RSVP deadline.
+names (English and Arabic: `name1Ar`/`name2Ar`), start/end time, venue, address, Maps URL and stage image path.
 **Change event details only there.** The page fills them in through `data-*` attributes such as `data-name1` and `data-venue`.
 Never hard-code these values in the markup.
 
@@ -53,21 +53,19 @@ Never hard-code these values in the markup.
   because WhatsApp's link preview doesn't run JavaScript. Keep them in sync with `CONFIG` when details change.
 - Times use ISO strings with the `+02:00` offset, and all formatting uses `timeZone: 'Africa/Cairo'`.
   Guests may open the link from abroad, so keep it that way.
-- `CONFIG.whatsapp` takes the country code plus the number, with no `+`, spaces or leading zero (e.g. `2010XXXXXXXX`).
-- `CONFIG.rsvpBy` must fall before the event date.
 
 ## Sections (in order)
 
-1. **Hero**: lavender sky gradient, soft sun glow (top right), festoon string lights, interlocked gold + silver flat-profile rings (SVG), names in script with the Arabic names below, Arabic invite line, date, a "Kindly RSVP" button, then the SVG stage scene (wavy central arch + two side arches with cascading roses, in front of a blue sea with drifting swell lines).
+1. **Hero**: lavender sky gradient, soft sun glow (top right), festoon string lights, interlocked gold + silver flat-profile rings (SVG), names in script with the Arabic names below, Arabic invite line, date, then the SVG stage scene (wavy central arch + two side arches with cascading roses, in front of a blue sea with drifting swell lines).
 2. **Countdown**: the couple illustration (`couple.webp`) on a lavender venue-arch panel, then venue-arch tiles with days, hours, minutes and seconds to `CONFIG.start`.
    The dress is **white**; the groom's suit is **dark charcoal grey** (both confirmed).
 3. **Stage ("Under the Arches")**: `stage.jpg` in a venue-arch frame. The frame's aspect ratio matches the image (900/1200), so update it if the image changes.
 4. **Details**: three venue-arch cards with SVG icons (When / Time / Where), a Maps link and an "Add to calendar" button (Google Calendar link).
 5. **Dress code ("Coastal Chic")**: labelled palette swatches and tip pills with SVG icons.
-6. **RSVP**: a form that opens WhatsApp with a prefilled message, with an inline error if the name is empty. There is no backend. A faint line drawing of the central arch sits behind it.
-7. **Footer**: names (script + Arabic), the Arabic line "في انتظاركم", the date, and the faint arch line drawing.
+6. **Footer**: names (script + Arabic), the Arabic line "في انتظاركم", the date, and the faint arch line drawing.
 
-The "Our Story" and "Morning Plan" timeline sections were **intentionally removed**. Do not add them back.
+The "Our Story" and "Morning Plan" timeline sections and the **RSVP** (hero button + form) were **intentionally removed**.
+Do not add them back.
 
 ## Design system
 
@@ -89,7 +87,8 @@ The stage photo keeps its natural colours; everything around it uses the tokens 
 | `--soft`   | `#585482` | secondary text                              |
 
 - **Contrast:** all text pairs above are ≥ 4.5:1 (soft on lilac is the tightest at 4.8:1). Re-check if you change a token.
-- **Names:** Great Vibes (script), only for the couple's names. The `&` is Cormorant italic in violet.
+- **Names:** Italianno (script), only for the couple's names; capitals must read as capitals (Great Vibes was dropped
+  because its M and A look lowercase). The `&` is Cormorant italic in violet.
 - **Headings:** Cormorant Garamond (400, italic for accents).
 - **Body and labels:** Jost 300 at 1rem. Labels are 500 weight, uppercase, wide letter-spacing, never smaller than .75rem.
 - **Arabic:** Amiri, with `direction: rtl` (`.ar` class).
@@ -99,7 +98,7 @@ The stage photo keeps its natural colours; everything around it uses the tokens 
   not a generic rounded shape. Simple rounded-top arches only for the small swatches and favicon; soft waves in the hero.
   Reuse these motifs rather than adding new ones.
 - **Icons:** inline stroke SVGs (`.icon`, 24px grid, 1.6 stroke), `aria-hidden="true"`. No emoji as icons.
-- **Touch:** buttons, inputs and links are at least 44px tall. Form fields use 1rem text so iOS doesn't zoom.
+- **Touch:** buttons and links are at least 44px tall.
 - **Motion:** gentle only. This means scroll reveal (`.reveal` → `.in`, only when JS runs), drifting sea swell and glowing bulbs.
   All of it is switched off under `prefers-reduced-motion`. Do the same for any animation you add.
 - A printed invitation card exists, but it's **only an art source**: never take event details from it
@@ -134,9 +133,9 @@ patterns for "wedding", which don't apply here).
   If asked to make the site bilingual, add Arabic alongside rather than replacing English.
 - Optimize images before shipping: the stage image should be ≤ 400 KB.
   Export it as WebP or JPEG at about 80% quality and roughly 1200px tall.
-- Keep accessibility basics: an `alt` on images, a label for each form field, and visible focus states.
+- Keep accessibility basics: an `alt` on images, accessible names on controls, and visible focus states.
 - Don't add trackers, analytics or cookie banners unless asked.
-- Don't add a backend. RSVPs go through WhatsApp.
+- Don't add a backend, forms or an RSVP (the couple removed RSVP on purpose).
 
 ## Preview and checks
 
@@ -151,7 +150,7 @@ Before saying a change is done, check all of the following:
 - The page loads with no console errors.
 - The countdown is ticking.
 - The stage image shows inside the arch.
-- "Open in Maps", "Add to calendar" and the RSVP button all open the correct links.
+- "Open in Maps" and "Add to calendar" open the correct links.
 - The layout holds at 375px, 768px and 1280px widths.
 - README.md is updated (sections + Changelog).
 
@@ -163,7 +162,6 @@ Static hosting works. The simplest options are:
   (including `stage.png`, `tools/`, `.claude/`); that's harmless, but never commit secrets.
 
 Before sharing the link:
-- Set `CONFIG.whatsapp` to the real number.
 - `og:url` and `og:image` are absolute URLs on `https://moemen-ali.github.io/engagement-invitation/` (WhatsApp ignores relative image URLs).
   If the site moves, change both. After changing names, date/time, venue, rings or the stage photo, re-run
   `python tools/og-card.py og-card.jpg` and keep the `<head>` description/og text in sync.
